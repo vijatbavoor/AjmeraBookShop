@@ -24,28 +24,21 @@ namespace AjmeraBookShopAPI.Controllers
         [Route("AddBook")]
         public async Task<IActionResult> AddBook(BookSeviceModel book)
         {
-            if (book == null)
+            if (book == null || ModelState.IsValid == false)
                 return BadRequest(ModelState);
 
-            if (ModelState.IsValid)
+            book.Id = Guid.NewGuid();
+            var bookMap = _mapper.Map<BookModel>(book);
+            bool isBookExist = await _unitOfWork.Books.IsBookExistByName(book);
+            if (isBookExist)
             {
-                book.Id = Guid.NewGuid();
-                var bookMap = _mapper.Map<BookModel>(book);
-                bool isBookExist = await _unitOfWork.Books.IsBookExistByName(bookMap);
-                if (isBookExist)
-                {
-                    ModelState.AddModelError("", $"Book with the name '{book.Name}' already exists");
-                    return StatusCode(422, ModelState);
-                }
-                await _unitOfWork.Books.Add(bookMap);
-                await _unitOfWork.SaveChanges();
+                ModelState.AddModelError("", $"Book with the name '{book.Name}' already exists");
+                return StatusCode(422, ModelState);
+            }
+            await _unitOfWork.Books.Add(bookMap);
+            await _unitOfWork.SaveChanges();
 
-                return CreatedAtAction("GetBook", new { bookMap.Id }, bookMap);
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
+            return CreatedAtAction("GetBook", new { bookMap.Id }, bookMap);
         }
 
         [HttpGet("{id}")]

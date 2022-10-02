@@ -1,5 +1,6 @@
 ﻿using AjmeraBookShopAPI.DataModel;
 using AjmeraBookShopAPI.DataRepository.Interface;
+using AjmeraBookShopAPI.ServiceModel;
 using Microsoft.EntityFrameworkCore;
 
 namespace AjmeraBookShopAPI.DataRepository
@@ -64,7 +65,7 @@ namespace AjmeraBookShopAPI.DataRepository
             }
         }
 
-        public async Task<bool> IsBookExistByName(BookModel book)
+        public async Task<bool> IsBookExistByName(BookSeviceModel book)
         {
             try
             {
