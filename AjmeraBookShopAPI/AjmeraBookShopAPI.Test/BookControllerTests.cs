@@ -170,5 +170,43 @@ namespace AjmeraBookShopAPI.Test
             A.CallTo(() => _unitOfWork.Books.Upsert(_dbBook)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _unitOfWork.SaveChanges()).MustHaveHappenedOnceExactly();
         }
+
+        [Fact]
+        public async void Should_Not_Delete_Book_If_Not_Exist_Return_NotFund_Reponce()
+        {
+            A.CallTo(() => _unitOfWork.Books.IsBookExistById(_bookId)).Returns(false);
+
+            // Act
+            var actionResult = await _bookController.DeleteBook(_bookId);
+            var result = actionResult as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(actionResult);
+            Assert.Equal(404, result.StatusCode);
+            A.CallTo(() => _unitOfWork.Books.IsBookExistById(_bookId)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _unitOfWork.Books.GetById(_bookId)).MustNotHaveHappened();
+            A.CallTo(() => _unitOfWork.Books.Delete(_dbBook)).MustNotHaveHappened();
+            A.CallTo(() => _unitOfWork.SaveChanges()).MustNotHaveHappened();
+        }
+
+        [Fact]
+        public async void Should_Delete_Book_If_Exist_Return_NoContent_Reponce()
+        {
+            A.CallTo(() => _unitOfWork.Books.IsBookExistById(_bookId)).Returns(true);
+            A.CallTo(() => _unitOfWork.Books.GetById(_bookId)).Returns(_dbBook);
+            A.CallTo(() => _unitOfWork.Books.Delete(_dbBook)).Returns(true);
+
+            // Act
+            var actionResult = await _bookController.DeleteBook(_bookId);
+            var result = actionResult as NoContentResult;
+
+            // Assert
+            Assert.NotNull(actionResult);
+            Assert.Equal(204, result.StatusCode);
+            A.CallTo(() => _unitOfWork.Books.IsBookExistById(_bookId)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _unitOfWork.Books.GetById(_bookId)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _unitOfWork.Books.Delete(_dbBook)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _unitOfWork.SaveChanges()).MustHaveHappenedOnceExactly();
+        }
     }
 }
