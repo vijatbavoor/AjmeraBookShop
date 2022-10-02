@@ -115,6 +115,21 @@ namespace AjmeraBookShopAPI.Test
         //    var result = actionResult as OkObjectResult;
 
         //}
-        
+
+        [Fact]
+        public async void Should_Get_All_Books_Return_Ok_Reponce()
+        {
+            A.CallTo(() => _unitOfWork.Books.GetAll()).Returns(_dbBooks);
+            A.CallTo(() => _mapper.Map<List<BookSeviceModel>>(_dbBooks)).Returns(_books);
+
+            // Act
+            var actionResult = await _bookController.GetAll();
+            var result = actionResult as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(actionResult);
+            Assert.Equal(200, result.StatusCode);
+            A.CallTo(() => _unitOfWork.Books.GetAll()).MustHaveHappenedOnceExactly();
+        }
     }
 }
