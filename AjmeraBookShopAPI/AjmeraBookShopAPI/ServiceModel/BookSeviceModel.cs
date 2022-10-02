@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace AjmeraBookShopAPI.DataModel
+namespace AjmeraBookShopAPI.ServiceModel
 {
-    public class BookModel
+    public class BookSeviceModel
     {
         public Guid Id { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
         public string AuthorName { get; set; }
-
-        //you can have the relationship model 
     }
 }

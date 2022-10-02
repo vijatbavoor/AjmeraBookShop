@@ -1,5 +1,6 @@
 ﻿using AjmeraBookShopAPI.DataModel;
 using AjmeraBookShopAPI.DataRepository.Interface;
+using AjmeraBookShopAPI.ServiceModel;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,29 +22,23 @@ namespace AjmeraBookShopAPI.Controllers
 
         [HttpPost]
         [Route("AddBook")]
-        public async Task<IActionResult> AddBook(BookModel book)
+        public async Task<IActionResult> AddBook(BookSeviceModel book)
         {
-            if (book == null)
+            if (book == null || ModelState.IsValid == false)
                 return BadRequest(ModelState);
 
-            if (ModelState.IsValid)
+            book.Id = Guid.NewGuid();
+            var bookMap = _mapper.Map<BookModel>(book);
+            bool isBookExist = await _unitOfWork.Books.IsBookExistByName(book);
+            if (isBookExist)
             {
-                book.Id = Guid.NewGuid();
-                bool isBookExist = await _unitOfWork.Books.IsBookExistByName(book);
-                if (isBookExist)
-                {
-                    ModelState.AddModelError("", $"Book with the name '{book.Name}' already exists");
-                    return StatusCode(422, ModelState);
-                }
-                await _unitOfWork.Books.Add(book);
-                await _unitOfWork.SaveChanges();
+                ModelState.AddModelError("", $"Book with the name '{book.Name}' already exists");
+                return StatusCode(422, ModelState);
+            }
+            await _unitOfWork.Books.Add(bookMap);
+            await _unitOfWork.SaveChanges();
 
-                return CreatedAtAction("GetBook", new { book.Id }, book);
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
+            return CreatedAtAction("GetBook", new { bookMap.Id }, bookMap);
         }
 
         [HttpGet("{id}")]
@@ -54,7 +49,10 @@ namespace AjmeraBookShopAPI.Controllers
             if (book == null)
                 return NotFound();
             else
-                return Ok(book);
+            {
+                var bookMap = _mapper.Map<BookSeviceModel>(book);
+                return Ok(bookMap);
+            }
         }
 
         [HttpGet()]
@@ -62,18 +60,20 @@ namespace AjmeraBookShopAPI.Controllers
         public async Task<IActionResult> GetAll()
         {
             var books = await _unitOfWork.Books.GetAll();
-            return Ok(books);
+            var booksMap = _mapper.Map<List<BookSeviceModel>>(books);
+            return Ok(booksMap);
         }
 
         [HttpPost("{id}")]
         //[Route("UpsertBook")]
-        public async Task<IActionResult> UpsertBook(Guid id, BookModel book)
+        public async Task<IActionResult> UpsertBook(Guid id, BookSeviceModel book)
         {
             if (id != book.Id)
                 return BadRequest(ModelState);
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            await _unitOfWork.Books.Upsert(book);
+            var bookMap = _mapper.Map<BookModel>(book);
+            await _unitOfWork.Books.Upsert(bookMap);
             await _unitOfWork.SaveChanges();
 
             return NoContent();

@@ -7,7 +7,7 @@ namespace AjmeraBookShopAPI.DataRepository
     {
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options) : base(options)
         {
-            
+            base.Database.EnsureCreated();
         }
 
         public virtual DbSet<BookModel> Books { get; set; }
