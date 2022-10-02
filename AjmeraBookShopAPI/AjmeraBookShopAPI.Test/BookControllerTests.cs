@@ -17,6 +17,9 @@ namespace AjmeraBookShopAPI.Test
         private readonly BookSeviceModel _newBook;
         private readonly BookModel _book;
         private readonly BookController _bookController;
+        private readonly Guid _bookId;
+        private readonly List<BookSeviceModel> _books;
+        private readonly List<BookModel> _dbBooks;
 
         public BookControllerTests()
         {
@@ -26,6 +29,8 @@ namespace AjmeraBookShopAPI.Test
 
             _newBook = A.Fake<BookSeviceModel>();
             _book = A.Fake<BookModel>();
+            _bookId = new Guid();
+            _books = A.Fake<List<BookSeviceModel>>();
 
             _bookController = new BookController(_logger, _unitOfWork, _mapper);
         }
@@ -81,5 +86,35 @@ namespace AjmeraBookShopAPI.Test
             A.CallTo(() => _unitOfWork.SaveChanges()).MustNotHaveHappened();
             A.CallTo(() => _unitOfWork.Books.Add(_book)).MustNotHaveHappened();
         }
+
+        [Fact]
+        public async void Should_Get_Book_By_Id_If_Exist_Return_Ok_Reponce()
+        {
+            // Arrange
+            A.CallTo(() => _unitOfWork.Books.GetById(A<Guid>._)).Returns(_book);
+            A.CallTo(() => _mapper.Map<BookSeviceModel>(_book)).Returns(_newBook);
+
+            // Act
+            var actionResult = await _bookController.GetBook(_bookId);
+            var result = actionResult as OkObjectResult;
+
+            // Assert
+            Assert.NotNull(actionResult);
+            Assert.Equal(200, result.StatusCode);
+            A.CallTo(() => _unitOfWork.Books.GetById(A<Guid>._)).MustHaveHappenedOnceExactly();
+        }
+
+        //[Fact]
+        //public async void Should_Get_Book_By_Id_If_Not_Exist_Return_Not_Found_Reponce()
+        //{
+        //    A.CallTo(() => _unitOfWork.Books.GetById(A<Guid>._)).Returns(null);
+        //    A.CallTo(() => _mapper.Map<BookSeviceModel>(_book)).Returns(_newBook);
+
+        //    // Act
+        //    var actionResult = await _bookController.GetBook(_bookId);
+        //    var result = actionResult as OkObjectResult;
+
+        //}
+        
     }
 }
