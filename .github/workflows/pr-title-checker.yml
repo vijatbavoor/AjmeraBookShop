@@ -1,6 +1,6 @@
 name: "PR Title Checker"
 on:
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited
@@ -12,7 +12,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: Slashgear/action-check-pr-title@v4.3.0
+      - uses: actions/checkout@v1
+      - uses: dylanvann/check-pull-request-title@v2.304.0
         with:
-          regexp: "(feat|fix|docs): .++"
-          helpMessage: "Example: 'feat: example of title'"
+          pattern: '^(UI|PAM)-\d* - '
