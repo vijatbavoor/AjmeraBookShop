@@ -1,0 +1,14 @@
+{
+    "LABEL": {
+      "name": "PR Title Checker",
+      "color": "EEEEEE"
+    },
+    "CHECKS": {
+        "regexp": "(PAM|TECH)-[0-9]+ .+"
+    },
+    "MESSAGES": {
+      "success": "PR title format looks good",
+      "failure": "PR titel should be follow the pattern \n PAM-<number> or TECH-<number> <titel>",
+      "notice": ""
+    }
+  }
