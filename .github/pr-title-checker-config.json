@@ -1,0 +1,14 @@
+{
+    "LABEL": {
+      "name": "PR Title Checker",
+      "color": "EEEEEE"
+    },
+    "CHECKS": {
+        "regexp": "(PAM|TECH)-[0-9] .+"
+    },
+    "MESSAGES": {
+      "success": "All OK",
+      "failure": "Failing CI test",
+      "notice": ""
+    }
+  }
