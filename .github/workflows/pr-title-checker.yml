@@ -12,7 +12,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: thehanimo/pr-title-checker@v1.4.0
+      - uses: Slashgear/action-check-pr-title@v4.3.0
         with:
           regexp: "(feat|fix|docs): .++"
           helpMessage: "Example: 'feat: example of title'"
