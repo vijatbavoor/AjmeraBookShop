@@ -10,6 +10,8 @@ namespace AjmeraBookShopAPI.DataModel
         [Required]
         public string AuthorName { get; set; }
 
+        public int Price { get; set; }
+
         //you can have the relationship model 
     }
 }
